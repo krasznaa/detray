@@ -45,5 +45,15 @@ int main(int argc, char **argv)
     output_file << json::write_grid(gps).dump(2);
     output_file.close();
     
+    // A full polar grid
+    axis::closed<3> radial_axis{1., 5.};
+    axis::circular<10> full_phiaxis{-M_PI, M_PI};
+
+    using grid2pf = grid2<decltype(replacer), decltype(radial_axis), decltype(full_phiaxis), decltype(serializer)>;
+    grid2pf gpf(std::move(radial_axis), std::move(full_phiaxis));
+
+    output_file.open("grid_pol_full.json");
+    output_file << json::write_grid(gpf).dump(2);
+    output_file.close();
 
 }
