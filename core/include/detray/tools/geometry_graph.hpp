@@ -108,7 +108,7 @@ class geometry_graph {
         node_queue.push(&(_nodes[0]));
 
         // Visit adjacent nodes and check current one
-        while (not node_queue.empty()) {
+        while (node_queue.empty() == false) {
             // Inspect
             current = node_queue.front();
             if (visited[current->index()]) {
@@ -125,7 +125,7 @@ class geometry_graph {
                 // Retrieve the node index the edge points to
                 dindex nbr = std::get<0>(edg.edge());
                 // If not leaving world and if not visited, enqueue the node
-                if ((nbr != dindex_invalid and nbr > 0) and not visited[nbr]) {
+                if (((nbr != dindex_invalid) && (nbr > 0)) && (!visited[nbr])) {
                     node_queue.push(&(_nodes[nbr]));
                 }
             }

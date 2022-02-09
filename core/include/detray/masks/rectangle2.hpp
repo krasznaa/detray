@@ -1,6 +1,6 @@
 /** Detray library, part of the ACTS project (R&D line)
  *
- * (c) 2020 CERN for the benefit of the ACTS project
+ * (c) 2020-2022 CERN for the benefit of the ACTS project
  *
  * Mozilla Public License Version 2.0
  */
@@ -92,8 +92,8 @@ struct rectangle2 {
     template <typename inside_local_t>
     DETRAY_HOST_DEVICE intersection_status
     is_inside(const point2 &p, const mask_tolerance t = within_epsilon) const {
-        return (std::abs(p[0]) <= _values[0] + t[0] and
-                std::abs(p[1]) <= _values[1] + t[1])
+        return ((std::abs(p[0]) <= (_values[0] + t[0])) &&
+                (std::abs(p[1]) <= (_values[1] + t[1])))
                    ? e_inside
                    : e_outside;
     }

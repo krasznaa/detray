@@ -8,6 +8,7 @@
 #include <gtest/gtest.h>
 
 #include <climits>
+#include <cmath>
 
 // detray test
 #include <vecmem/memory/host_memory_resource.hpp>
@@ -102,10 +103,10 @@ TEST(grids, regular_circular_axis) {
     // Remap test
     EXPECT_EQ(full_pi.remap(4, -1), 3u);
     EXPECT_EQ(full_pi.remap(4, 1), 5u);
-    EXPECT_EQ(full_pi.remap(0, -1), 35);
-    EXPECT_EQ(full_pi.remap(0, -2), 34);
-    EXPECT_EQ(full_pi.remap(-1, -1), 34);
-    EXPECT_EQ(full_pi.remap(35, 1), 0);
+    EXPECT_EQ(full_pi.remap(0, -1), 35u);
+    EXPECT_EQ(full_pi.remap(0, -2), 34u);
+    EXPECT_EQ(full_pi.remap(static_cast<unsigned int>(-1), -1), 34u);
+    EXPECT_EQ(full_pi.remap(35, 1), 0u);
 
     // Axis range access - binned (symmetric & asymmetric)
     darray<dindex, 2> zone00 = {0u, 0u};

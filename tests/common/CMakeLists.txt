@@ -22,3 +22,10 @@ if( DETRAY_BENCHMARKS_MULTITHREAD )
    target_compile_definitions( detray_tests_common
       INTERFACE DETRAY_BENCHMARKS_MULTITHREAD )
 endif()
+
+# Make sure that definitions (like M_PI) from <cmath> would be available
+# with MSVC.
+if( "${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC" )
+   target_compile_definitions( detray_tests_common
+      INTERFACE _USE_MATH_DEFINES )
+endif()

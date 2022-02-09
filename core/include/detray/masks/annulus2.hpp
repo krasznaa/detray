@@ -1,6 +1,6 @@
 /** Detray library, part of the ACTS project (R&D line)
  *
- * (c) 2020 CERN for the benefit of the ACTS project
+ * (c) 2020-2022 CERN for the benefit of the ACTS project
  *
  * Mozilla Public License Version 2.0
  */
@@ -128,13 +128,14 @@ struct annulus2 {
             scalar minR_tol = _values[0] - t[0];
             scalar maxR_tol = _values[1] + t[0];
 
-            if (r_mod2 < minR_tol * minR_tol or r_mod2 > maxR_tol * maxR_tol)
+            if ((r_mod2 < (minR_tol * minR_tol)) || (r_mod2 > (maxR_tol * maxR_tol))) {
                 return e_outside;
+            }
 
             scalar phi_strp = getter::phi(p) - _values[6];
             // Check phi boundaries, which are well def. in local frame
-            return (phi_strp >= _values[2] - t[1] and
-                    phi_strp <= _values[3] + t[1])
+            return ((phi_strp >= (_values[2] - t[1])) &&
+                    (phi_strp <= (_values[3] + t[1])))
                        ? e_inside
                        : e_outside;
         }
@@ -160,8 +161,8 @@ struct annulus2 {
             scalar minR_tol = _values[0] - t[0];
             scalar maxR_tol = _values[1] + t[0];
 
-            return (r_mod2 >= minR_tol * minR_tol and
-                    r_mod2 <= maxR_tol * maxR_tol)
+            return ((r_mod2 >= (minR_tol * minR_tol)) &&
+                    (r_mod2 <= (maxR_tol * maxR_tol)))
                        ? e_inside
                        : e_outside;
         }

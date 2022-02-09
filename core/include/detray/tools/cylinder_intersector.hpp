@@ -15,7 +15,7 @@
 
 namespace detray {
 
-class unbound;
+struct unbound;
 
 /** This is an intersector struct for generic cylinder surface
  */
@@ -45,7 +45,7 @@ struct cylinder_intersector {
     template <
         typename track_t, typename mask_t,
         std::enable_if_t<
-            std::is_same_v<typename mask_t::local_type, cylindrical2> or
+            std::is_same_v<typename mask_t::local_type, cylindrical2> ||
                 std::is_same_v<typename mask_t::local_type, detray::unbound>,
             bool> = true>
     DETRAY_HOST_DEVICE inline intersection intersect(
@@ -76,7 +76,7 @@ struct cylinder_intersector {
     template <
         typename mask_t,
         std::enable_if_t<
-            std::is_same_v<typename mask_t::local_type, cylindrical2> or
+            std::is_same_v<typename mask_t::local_type, cylindrical2> ||
                 std::is_same_v<typename mask_t::local_type, detray::unbound>,
             bool> = true>
     DETRAY_HOST_DEVICE inline intersection intersect(

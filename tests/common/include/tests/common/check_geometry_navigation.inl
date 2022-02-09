@@ -66,7 +66,7 @@ struct print_inspector {
         for (const auto &sf_cand : state.candidates()) {
             debug_stream << sf_cand.to_string();
         }
-        if (not state.candidates().empty()) {
+        if (state.candidates().empty() == false) {
             debug_stream << "=> next: ";
             if (state.is_exhausted()) {
                 debug_stream << "exhausted" << std::endl;
@@ -243,10 +243,10 @@ TEST(ALGEBRA_PLUGIN, geometry_discovery) {
                 if (obj_tracer[intr_idx].index !=
                     intersection_trace[intr_idx].first) {
                     // Intersection record at portal bound might be flipped
-                    if (obj_tracer[intr_idx].index ==
-                            intersection_trace[intr_idx + 1].first and
-                        obj_tracer[intr_idx + 1].index ==
-                            intersection_trace[intr_idx].first) {
+                    if ((obj_tracer[intr_idx].index ==
+                            intersection_trace[intr_idx + 1].first) &&
+                        (obj_tracer[intr_idx + 1].index ==
+                            intersection_trace[intr_idx].first)) {
                         // Have already checked the next record
                         ++intr_idx;
                         continue;

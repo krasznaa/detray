@@ -18,7 +18,7 @@
 
 namespace detray {
 
-class unbound;
+struct unbound;
 
 /** This is an intersector struct for a concetric cylinder surface
  */
@@ -50,7 +50,7 @@ struct concentric_cylinder_intersector {
     template <
         typename track_t, typename mask_t,
         std::enable_if_t<
-            std::is_same_v<typename mask_t::local_type, cylindrical2> or
+            std::is_same_v<typename mask_t::local_type, cylindrical2> ||
                 std::is_same_v<typename mask_t::local_type, detray::unbound>,
             bool> = true>
     DETRAY_HOST_DEVICE inline intersection intersect(
@@ -80,7 +80,7 @@ struct concentric_cylinder_intersector {
     template <
         typename mask_t,
         std::enable_if_t<
-            std::is_same_v<typename mask_t::local_type, cylindrical2> or
+            std::is_same_v<typename mask_t::local_type, cylindrical2> ||
                 std::is_same_v<typename mask_t::local_type, detray::unbound>,
             bool> = true>
     DETRAY_HOST_DEVICE inline intersection intersect(
@@ -125,13 +125,13 @@ struct concentric_cylinder_intersector {
             candidates[1][2] = ro[2] + t01[1] * rd[2];
 
             // Chose the index, take the smaller positive one
-            int cindex = (t01[0] < t01[1] and t01[0] > overstep_tolerance)
+            int cindex = ((t01[0] < t01[1]) && (t01[0] > overstep_tolerance))
                              ? 0
-                             : (t01[0] < overstep_tolerance and
-                                        t01[1] > overstep_tolerance
+                             : ((t01[0] < overstep_tolerance) &&
+                                        (t01[1] > overstep_tolerance)
                                     ? 1
                                     : 0);
-            if (t01[0] > overstep_tolerance or t01[1] > overstep_tolerance) {
+            if ((t01[0] > overstep_tolerance) || (t01[1] > overstep_tolerance)) {
                 intersection is;
                 is.p3 = candidates[cindex];
                 is.path = t01[cindex];

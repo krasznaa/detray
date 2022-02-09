@@ -30,7 +30,7 @@ inline void check_towards_surface(state_t &state, dindex vol_id,
     // the portal is still the next object, since we did not step
     ASSERT_EQ(state.next()->index, next_id);
     ASSERT_TRUE((state.trust_level() ==
-                 navigator_t::navigation_trust_level::e_full_trust) or
+                 navigator_t::navigation_trust_level::e_full_trust) ||
                 (state.trust_level() ==
                  navigator_t::navigation_trust_level::e_high_trust));
 }

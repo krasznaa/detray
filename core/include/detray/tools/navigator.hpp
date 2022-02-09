@@ -292,7 +292,7 @@ class navigator {
 
         // Should never be the case after update call (without portals we are
         // trapped)
-        if (navigation.candidates().empty() and heartbeat) {
+        if (navigation.candidates().empty() && heartbeat) {
             return navigation.abort();
         }
 
@@ -396,7 +396,7 @@ class navigator {
         // Update current candidate, or close neighbors
         // - do this only when you trust level is high
         else if (navigation.trust_level() >= e_high_trust) {
-            while (not navigation.is_exhausted()) {
+            while (navigation.is_exhausted() == false) {
                 // Only update the next candidate
                 dindex obj_idx = navigation.next()->index;
                 auto sfi =
@@ -464,7 +464,7 @@ class navigator {
     inline void set_next(state &navigation) const {
 
         // Sort distance to next & set navigation status
-        if (not navigation.candidates().empty()) {
+        if (navigation.candidates().empty() == false) {
 
             // Take the nearest candidate first
             detail::sequential_sort(navigation.candidates().begin(),
@@ -504,8 +504,8 @@ class navigator {
     DETRAY_HOST_DEVICE
     bool check_volume_switch(state &navigation) const {
         // Check if we need to switch volume index and (re-)initialize
-        if (navigation.status() == e_on_object and
-            navigation.volume() != navigation.current()->link) {
+        if ((navigation.status() == e_on_object) &&
+            (navigation.volume() != navigation.current()->link)) {
 
             // Set volume index to the next volume provided by the object
             navigation.set_volume(navigation.current()->link);

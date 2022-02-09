@@ -1,6 +1,6 @@
 /** Detray library, part of the ACTS project (R&D line)
  *
- * (c) 2020 CERN for the benefit of the ACTS project
+ * (c) 2020-2022 CERN for the benefit of the ACTS project
  *
  * Mozilla Public License Version 2.0
  */
@@ -91,11 +91,11 @@ struct ring2 {
         if constexpr (std::is_same_v<inside_local_t,
                                      __plugin::cartesian2<detray::scalar> >) {
             scalar r = getter::perp(p);
-            return (r + t >= _values[0] and r <= _values[1] + t) ? e_inside
+            return (((r + t) >= _values[0]) && (r <= (_values[1] + t))) ? e_inside
                                                                  : e_outside;
         }
 
-        return (p[0] + t >= _values[0] and p[0] <= _values[1] + t) ? e_inside
+        return (((p[0] + t) >= _values[0]) && (p[0] <= (_values[1] + t))) ? e_inside
                                                                    : e_outside;
     }
 

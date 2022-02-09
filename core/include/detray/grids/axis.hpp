@@ -1,6 +1,6 @@
 /** Detray library, part of the ACTS project (R&D line)
  *
- * (c) 2020 CERN for the benefit of the ACTS project
+ * (c) 2020-2022 CERN for the benefit of the ACTS project
  *
  * Mozilla Public License Version 2.0
  */
@@ -76,7 +76,7 @@ struct regular {
     DETRAY_HOST_DEVICE
     dindex bin(scalar v) const {
         int ibin = static_cast<int>((v - min) / (max - min) * n_bins);
-        if (ibin >= 0 and ibin < static_cast<int>(n_bins)) {
+        if ((ibin >= 0) && (ibin < static_cast<int>(n_bins))) {
             return static_cast<dindex>(ibin);
         } else {
             if (ibin < 0) {
@@ -256,7 +256,7 @@ struct circular {
     DETRAY_HOST_DEVICE
     dindex bin(scalar v) const {
         int ibin = static_cast<int>((v - min) / (max - min) * n_bins);
-        if (ibin >= 0 and ibin < static_cast<int>(n_bins)) {
+        if ((ibin >= 0) && (ibin < static_cast<int>(n_bins))) {
             return static_cast<dindex>(ibin);
         } else {
             if (ibin < 0) {
@@ -367,7 +367,7 @@ struct circular {
     DETRAY_HOST_DEVICE
     dindex remap(dindex ibin, int shood) const {
         int opt_bin = static_cast<int>(ibin) + shood;
-        if (opt_bin >= 0 and opt_bin < static_cast<int>(n_bins)) {
+        if ((opt_bin >= 0) && (opt_bin < static_cast<int>(n_bins))) {
             return static_cast<dindex>(opt_bin);
         }
         if (opt_bin < 0) {
@@ -435,7 +435,7 @@ struct irregular {
     /** Constructor with vecmem memory resource - rvalue **/
     DETRAY_HOST irregular(vector_t<scalar> &&bins,
                           vecmem::memory_resource &resource)
-        : n_bins(bins.size() - 1),
+        : n_bins(static_cast<dindex>(bins.size() - 1)),
           min(bins[0]),
           max(bins[n_bins]),
           boundaries(bins, &resource) {}
@@ -443,7 +443,7 @@ struct irregular {
     /** Constructor with vecmem memory resource - lvalue **/
     DETRAY_HOST irregular(vector_t<scalar> &bins,
                           vecmem::memory_resource &resource)
-        : n_bins(bins.size() - 1),
+        : n_bins(static_cast<dindex>(bins.size() - 1)),
           min(bins[0]),
           max(bins[n_bins]),
           boundaries(bins, &resource) {}
@@ -481,7 +481,7 @@ struct irregular {
         int ibin = static_cast<int>(
             std::lower_bound(boundaries.begin(), boundaries.end(), v) -
             boundaries.begin());
-        if (ibin > 0 and ibin < static_cast<int>(boundaries.size())) {
+        if ((ibin > 0) && (ibin < static_cast<int>(boundaries.size()))) {
             return static_cast<dindex>(--ibin);
         } else {
             if (ibin == 0) {
@@ -504,7 +504,7 @@ struct irregular {
                        const array_t<dindex, 2> &nhood = {0u, 0u}) const {
 
         dindex ibin = bin(v);
-        int bins = boundaries.size() - 1;
+        std::size_t bins = boundaries.size() - 1;
         int ibinmin = ibin - static_cast<int>(nhood[0]);
         int ibinmax = ibin + static_cast<int>(nhood[1]);
         dindex min_bin = (ibinmin >= 0) ? static_cast<dindex>(ibinmin) : 0;

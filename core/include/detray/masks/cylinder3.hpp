@@ -1,6 +1,6 @@
 /** Detray library, part of the ACTS project (R&D line)
  *
- * (c) 2020 CERN for the benefit of the ACTS project
+ * (c) 2020-2022 CERN for the benefit of the ACTS project
  *
  * Mozilla Public License Version 2.0
  */
@@ -105,7 +105,7 @@ struct cylinder3 {
                 return e_missed;
             }
         }
-        return (_values[1] - t[1] <= p[2] and p[2] <= _values[2] + t[1])
+        return (((_values[1] - t[1]) <= p[2]) && (p[2] <= (_values[2] + t[1])))
                    ? e_inside
                    : e_outside;
     }

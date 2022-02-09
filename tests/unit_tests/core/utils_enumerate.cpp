@@ -34,7 +34,7 @@ TEST(utils, sequence_range) {
     std::vector<dindex> reference = {2, 3, 4, 5, 6, 7};
     std::vector<dindex> check = {};
     for (auto i : sequence(range)) {
-        check.push_back(i);
+        check.push_back(static_cast<dindex>(i));
     }
     ASSERT_EQ(check, reference);
 }

@@ -1,6 +1,6 @@
 /** Detray library, part of the ACTS project (R&D line)
  *
- * (c) 2021 CERN for the benefit of the ACTS project
+ * (c) 2021-2022 CERN for the benefit of the ACTS project
  *
  * Mozilla Public License Version 2.0
  */
@@ -55,8 +55,8 @@ inline void add_cylinder_surface(const dindex volume_id, context_t &ctx,
 
     // add surface
     typename surface_container_t::value_type::value_type::mask_links mask_link{
-        cylinder_id, masks.template size<cylinder_id>() - 1};
-    surfaces[cylinder_id].emplace_back(transforms[cylinder_id].size(ctx) - 1,
+        cylinder_id, static_cast<dindex>(masks.template size<cylinder_id>() - 1)};
+    surfaces[cylinder_id].emplace_back(static_cast<dindex>(transforms[cylinder_id].size(ctx) - 1),
                                        mask_link, volume_id, dindex_invalid);
 
     surfaces[cylinder_id].back().set_edge(edge);
@@ -100,8 +100,8 @@ inline void add_disc_surface(const dindex volume_id, context_t &ctx,
 
     // add surface
     typename surface_container_t::value_type::value_type::mask_links mask_link{
-        disc_id, masks.template size<disc_id>() - 1};
-    surfaces[disc_id].emplace_back(transforms[disc_id].size(ctx) - 1, mask_link,
+        disc_id, static_cast<dindex>(masks.template size<disc_id>() - 1)};
+    surfaces[disc_id].emplace_back(static_cast<dindex>(transforms[disc_id].size(ctx) - 1), mask_link,
                                    volume_id, dindex_invalid);
 
     surfaces[disc_id].back().set_edge(edge);
@@ -245,8 +245,8 @@ inline void create_barrel_modules(context_t &ctx, volume_type &vol,
     for (auto &m_center : m_centers) {
 
         // Surfaces with the linking into the local containers
-        m_id = {rectangle_id, masks.template size<rectangle_id>()};
-        surfaces[rectangle_id].emplace_back(transforms[rectangle_id].size(ctx),
+        m_id = {rectangle_id, static_cast<dindex>(masks.template size<rectangle_id>())};
+        surfaces[rectangle_id].emplace_back(static_cast<dindex>(transforms[rectangle_id].size(ctx)),
                                             m_id, volume_id, dindex_invalid);
         surfaces[rectangle_id].back().set_edge({volume_id, dindex_invalid});
         surfaces[rectangle_id].back().set_grid_status(true);
@@ -308,7 +308,7 @@ inline void create_barrel_grid(surfaces_grid_t &surfaces_grid,
  * @return a vector of the module positions in a ring
  */
 inline auto module_positions_ring(scalar z, scalar radius, scalar phi_stagger,
-                                  scalar phi_sub_stagger, int n_phi_bins) {
+                                  scalar phi_sub_stagger, std::size_t n_phi_bins) {
     // create and fill the positions
     std::vector<vector3> r_positions;
     r_positions.reserve(n_phi_bins);
@@ -424,7 +424,7 @@ void create_endcap_modules(context_t &ctx, volume_type &vol,
         for (const auto &m_position : r_postitions) {
             // trapezoid mask
             mask_link_t mask_link{trapezoid_id,
-                                  masks.template size<trapezoid_id>()};
+                                  static_cast<dindex>(masks.template size<trapezoid_id>())};
             masks.template add_mask<trapezoid_id>(cfg.m_half_x_min_y[ir],
                                                   cfg.m_half_x_max_y[ir],
                                                   cfg.m_half_y[ir]);
@@ -434,7 +434,7 @@ void create_endcap_modules(context_t &ctx, volume_type &vol,
 
             // Surfaces with the linking into the local containers
             surfaces[trapezoid_id].emplace_back(
-                transforms[trapezoid_id].size(ctx), mask_link, volume_id,
+                static_cast<dindex>(transforms[trapezoid_id].size(ctx)), mask_link, volume_id,
                 dindex_invalid);
             surfaces[trapezoid_id].back().set_edge({volume_id, dindex_invalid});
             surfaces[trapezoid_id].back().set_grid_status(true);
@@ -469,8 +469,8 @@ inline void create_endcap_grid(surfaces_grid_t &surfaces_grid,
     // add surface grid
     // TODO: WHat is the proper value of n_phi_bins?
     typename surfaces_grid_t::axis_p0_type r_axis(
-        cfg.disc_binning.size(), cfg.inner_r, cfg.outer_r, resource);
-    typename surfaces_grid_t::axis_p1_type phi_axis(cfg.disc_binning.front(),
+        static_cast<dindex>(cfg.disc_binning.size()), cfg.inner_r, cfg.outer_r, resource);
+    typename surfaces_grid_t::axis_p1_type phi_axis(static_cast<dindex>(cfg.disc_binning.front()),
                                                     -M_PI, M_PI, resource);
 
     surfaces_grid = surfaces_grid_t(r_axis, phi_axis, resource);
@@ -529,7 +529,7 @@ inline void add_beampipe(
 
     // negative endcap portals
     unsigned int volume_link = beampipe_idx;
-    for (int i = vol_sizes.size() - 1; i >= 0; --i) {
+    for (std::size_t i = vol_sizes.size() - 1; i >= 0; --i) {
         edge = {++volume_link, inv_sf_finder};
         add_cylinder_surface(beampipe_idx, ctx, surfaces, masks, transforms,
                              edc_inner_r, -vol_sizes[i].second,
@@ -656,7 +656,7 @@ void add_endcap_detector(
     std::vector<std::vector<typename detector_t::edge_type>> edges_vec;
     dindex leaving_world = dindex_invalid, inv_sf_finder = dindex_invalid;
     dindex first_vol_idx = det.volumes().back().index() + 1;
-    dindex last_vol_idx = first_vol_idx + 2 * n_layers - 2;
+    dindex last_vol_idx = static_cast<dindex>(first_vol_idx + 2 * n_layers - 2);
     dindex prev_vol_idx = first_vol_idx - 1;
     dindex next_vol_idx = first_vol_idx + 1;
 
@@ -748,7 +748,7 @@ template <typename empty_vol_factory, typename brl_module_factory,
           typename detector_t, typename config_t>
 void add_barrel_detector(
     detector_t &det, vecmem::memory_resource &resource,
-    typename detector_t::context &ctx, const unsigned int n_layers,
+    typename detector_t::context &ctx, std::size_t n_layers,
     dindex beampipe_idx, const scalar brl_half_z,
     const std::vector<std::pair<scalar, scalar>> &lay_sizes,
     const std::vector<scalar> &lay_positions,
@@ -757,7 +757,7 @@ void add_barrel_detector(
     // Generate consecutive linking between volumes
     dindex leaving_world = dindex_invalid, inv_sf_finder = dindex_invalid;
     dindex first_vol_idx = det.volumes().back().index();
-    dindex last_vol_idx = first_vol_idx + 2 * n_layers;
+    dindex last_vol_idx = static_cast<dindex>(first_vol_idx + 2 * n_layers);
     dindex prev_vol_idx = first_vol_idx;
     dindex next_vol_idx = n_layers > 1 ? first_vol_idx + 2 : leaving_world;
 
@@ -853,7 +853,7 @@ auto create_toy_geometry(vecmem::memory_resource &resource,
     const std::vector<std::pair<scalar, scalar>> brl_lay_sizes = {
         {0., 27.}, {27., 38.}, {64., 80.}, {108., 124.}, {164., 180.}};
     const std::vector<std::pair<int, int>> brl_binning = {
-        {0., 0.}, {16, 14}, {32, 14}, {52, 14}, {78, 14}};
+        {0, 0}, {16, 14}, {32, 14}, {52, 14}, {78, 14}};
     // module parameters
     struct brl_m_config {
         scalar m_half_x = 8.4;
@@ -974,9 +974,9 @@ auto create_toy_geometry(vecmem::memory_resource &resource,
             std::to_string(brl_positions.size() - 1) + ")!");
     }
     // the radius of the endcaps and  the barrel section need to match
-    if (n_edc_layers > 0 and
-        std::fabs(brl_lay_sizes[n_brl_layers].second - edc_config.outer_r) >
-            std::numeric_limits<scalar>::epsilon()) {
+    if ((n_edc_layers > 0) &&
+        (std::fabs(brl_lay_sizes[n_brl_layers].second - edc_config.outer_r) >
+            std::numeric_limits<scalar>::epsilon())) {
         throw std::invalid_argument(
             "ERROR: Barrel and endcap radii do not match!");
     }
@@ -1014,7 +1014,7 @@ auto create_toy_geometry(vecmem::memory_resource &resource,
     }
     if (n_edc_layers > 0) {
         // gap layer that connects barrel and pos. endcap
-        edc_config.side = 1.;
+        edc_config.side = 1;
         // innermost barrel layer volume id
         dindex prev_vol_idx =
             n_brl_layers == 0 ? leaving_world : 2 * n_edc_layers + 1;

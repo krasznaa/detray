@@ -57,8 +57,8 @@ TEST(ALGEBRA_PLUGIN, volume) {
     ASSERT_TRUE(v1.template range<object_registry::id::e_portal>() ==
                 portal_range);
     ASSERT_FALSE(v1.empty());
-    ASSERT_EQ(v1.template n_objects<object_registry::id::e_surface>(), 6);
-    ASSERT_EQ(v1.template n_objects<object_registry::id::e_portal>(), 4);
+    ASSERT_EQ(v1.template n_objects<object_registry::id::e_surface>(), 6u);
+    ASSERT_EQ(v1.template n_objects<object_registry::id::e_portal>(), 4u);
 
     // Check copy constructor
     const auto v2 = volume(v1);

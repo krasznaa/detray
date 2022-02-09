@@ -194,7 +194,7 @@ class detector {
     volume_type &new_volume(const array_type<scalar, 6> &bounds,
                             dindex surfaces_finder_entry = dindex_invalid) {
         volume_type &cvolume = _volumes.emplace_back(bounds);
-        cvolume.set_index(_volumes.size() - 1);
+        cvolume.set_index(static_cast<dindex>(_volumes.size() - 1));
         cvolume.set_surfaces_finder(surfaces_finder_entry);
 
         return cvolume;
@@ -334,7 +334,7 @@ class detector {
         // iterate over surfaces to fill the grid
         for (const auto &[surf_idx, surf] : enumerate(_surfaces, vol)) {
             if (surf.get_grid_status() == true) {
-                auto sidx = surf_idx;
+                dindex sidx = static_cast<dindex>(surf_idx);
 
                 auto &trf =
                     _transforms.contextual_transform(ctx, surf.transform());
@@ -390,7 +390,7 @@ class detector {
         // and the corresponding masks
         auto &object_masks = masks.template group<current_type>();
 
-        if (not object_transforms.empty(ctx) and not typed_surfaces.empty()) {
+        if ((object_transforms.empty(ctx) == false) && (typed_surfaces.empty() == false)) {
             // Current offsets into detectors containers
             const auto trsf_offset = _transforms.size(ctx);
             const auto mask_offset = _masks.template size<current_type>();
@@ -401,8 +401,8 @@ class detector {
 
             // Update the surfaces mask link
             for (auto &obj : typed_surfaces) {
-                detail::get<1>(obj.mask()) += mask_offset;
-                obj.transform() += trsf_offset;
+                detail::get<1>(obj.mask()) += static_cast<dindex>(mask_offset);
+                obj.transform() += static_cast<transform_link>(trsf_offset);
             }
 
             // Now put the updated objects into the geometry
@@ -411,7 +411,7 @@ class detector {
             _surfaces.insert(_surfaces.end(), typed_surfaces.begin(),
                              typed_surfaces.end());
 
-            volume.update_range({offset, _surfaces.size()});
+            volume.update_range({static_cast<dindex>(offset), static_cast<dindex>(_surfaces.size())});
         }
 
         // Next mask type
