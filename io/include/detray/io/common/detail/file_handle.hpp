@@ -47,9 +47,11 @@ class file_handle final {
     file_handle(const std::string& file_name,
                 std::ios_base::openmode mode = std::ios_base::in |
                                                std::ios_base::out)
-        : file_handle(std::filesystem::path{file_name}.parent_path() /
-                          std::filesystem::path{file_name}.stem(),
-                      std::filesystem::path{file_name}.extension(), mode) {}
+        : file_handle((std::filesystem::path{file_name}.parent_path() /
+                       std::filesystem::path{file_name}.stem())
+                          .string(),
+                      std::filesystem::path{file_name}.extension().string(),
+                      mode) {}
 
     /// File gets created with a @param name and @param extension
     file_handle(const std::string& name, const std::string& extension,
@@ -60,7 +62,7 @@ class file_handle final {
 
         // Pure output mode without replacement of file: Check if name is taken
         // and modify it if necessary
-        if (mode == std::ios_base::out or
+        if ((mode == std::ios_base::out) ||
             (mode == (std::ios_base::out | std::ios_base::binary))) {
             // Default name for output
             file_stem =
@@ -81,14 +83,14 @@ class file_handle final {
                 }
             }
             // Pure input mode: Check if file name makes sense and file exists
-        } else if ((mode == std::ios_base::in) or
+        } else if ((mode == std::ios_base::in) ||
                    (mode == (std::ios_base::in | std::ios_base::binary))) {
             if (file_stem.empty()) {
                 throw std::invalid_argument("File name empty");
             }
 
             std::filesystem::path file_path{file_stem + extension};
-            if (not std::filesystem::exists(file_path)) {
+            if (!std::filesystem::exists(file_path)) {
                 throw std::invalid_argument(
                     "Could not open file: File does not exist: " + file_stem +
                     extension);
@@ -139,7 +141,7 @@ class file_handle final {
         // File stem already comes with a number, simply update it
         if (n > 2u) {
             std::size_t pos{stem.rfind(delim)};
-            if (pos == std::string::npos or (pos + 1 == stem.size())) {
+            if ((pos == std::string::npos) || (pos + 1 == stem.size())) {
                 throw std::runtime_error("Malformed file name");
             }
 

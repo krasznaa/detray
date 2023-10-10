@@ -958,7 +958,7 @@ inline auto create_toy_geometry(vecmem::memory_resource &resource,
         {108.f, 124.f},
         {164.f, 180.f}};
     const std::vector<std::pair<int, int>> brl_binning = {
-        {0.f, 0.f}, {16.f, 14.f}, {32.f, 14.f}, {52.f, 14.f}, {78.f, 14.f}};
+        {0, 0}, {16, 14}, {32, 14}, {52, 14}, {78, 14}};
     // module parameters
     struct brl_m_config {
         scalar m_half_x{8.4f};
@@ -1066,7 +1066,7 @@ inline auto create_toy_geometry(vecmem::memory_resource &resource,
             std::to_string(brl_positions.size() - 1u) + ")!");
     }
     // the radius of the endcaps and  the barrel section need to match
-    if (cfg.n_edc_layers() > 0 and
+    if ((cfg.n_edc_layers() > 0) &&
         std::fabs(brl_lay_sizes[cfg.n_brl_layers()].second -
                   edc_config.outer_r) >
             std::numeric_limits<scalar>::epsilon()) {
@@ -1075,7 +1075,7 @@ inline auto create_toy_geometry(vecmem::memory_resource &resource,
     }
 
     // beampipe
-    const dindex beampipe_idx{0u};
+    static const dindex beampipe_idx{0u};
     add_beampipe(det, resource, ctx0, name_map, cfg.n_edc_layers(),
                  cfg.n_brl_layers(), edc_lay_sizes, brl_lay_sizes[0],
                  brl_positions[0], brl_half_z, edc_config.inner_r);
@@ -1107,7 +1107,7 @@ inline auto create_toy_geometry(vecmem::memory_resource &resource,
     }
     if (cfg.n_edc_layers() > 0u) {
         // gap layer that connects barrel and pos. endcap
-        edc_config.side = 1.;
+        edc_config.side = 1;
         // innermost barrel layer volume id
         dindex prev_vol_idx = cfg.n_brl_layers() == 0
                                   ? leaving_world

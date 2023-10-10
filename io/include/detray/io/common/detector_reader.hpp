@@ -110,9 +110,9 @@ auto assemble_reader(const io::detector_reader_config& cfg) {
                                             header.tag +
                                             "' in input file: " + file_name);
             }
-        } else if (extension == ".cvf" and check_covfie_file(file_name)) {
+        } else if ((extension == ".cvf") && check_covfie_file(file_name)) {
             // This is the file type covfie uses
-            if constexpr (not std::is_same_v<
+            if constexpr (!std::is_same_v<
                               typename detector_t::bfield_type::backend_t,
                               bfield::const_bknd_t>) {
                 std::cout << "Adding an inhom bfield reader" << std::endl;

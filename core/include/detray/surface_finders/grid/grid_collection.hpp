@@ -39,8 +39,8 @@ template <typename multi_axis_t, typename value_t,
           template <std::size_t> class serializer_t, typename populator_t>
 class grid_collection<
     detray::grid<multi_axis_t, value_t, serializer_t, populator_t>,
-    std::enable_if_t<not detray::grid<multi_axis_t, value_t, serializer_t,
-                                      populator_t>::is_owning,
+    std::enable_if_t<!detray::grid<multi_axis_t, value_t, serializer_t,
+                                   populator_t>::is_owning,
                      void>> {
 
     public:

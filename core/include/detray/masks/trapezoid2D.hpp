@@ -97,11 +97,11 @@ class trapezoid2D {
         const scalar_t tol = std::numeric_limits<scalar_t>::epsilon()) const {
         const scalar_t rel_y{(bounds[e_half_length_2] + loc_p[1]) *
                              bounds[e_divisor]};
-        return (std::abs(loc_p[0]) <= bounds[e_half_length_0] +
-                                          rel_y * (bounds[e_half_length_1] -
-                                                   bounds[e_half_length_0]) +
-                                          tol and
-                std::abs(loc_p[1]) <= bounds[e_half_length_2] + tol);
+        return ((std::abs(loc_p[0]) <=
+                 (bounds[e_half_length_0] +
+                  rel_y * (bounds[e_half_length_1] - bounds[e_half_length_0]) +
+                  tol)) &&
+                (std::abs(loc_p[1]) <= (bounds[e_half_length_2] + tol)));
     }
 
     /// @brief Lower and upper point for minimal axis aligned bounding box.
@@ -144,7 +144,8 @@ class trapezoid2D {
 
         constexpr auto tol{10.f * std::numeric_limits<scalar_t>::epsilon()};
 
-        if (bounds[e_half_length_0] < tol or bounds[e_half_length_1] < tol) {
+        if ((bounds[e_half_length_0] < tol) ||
+            (bounds[e_half_length_1] < tol)) {
             os << "ERROR: Half length in x must be in the range (0, "
                   "numeric_max)"
                << std::endl;

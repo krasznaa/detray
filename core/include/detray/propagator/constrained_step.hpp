@@ -68,9 +68,8 @@ template <template <typename, std::size_t> class array_t = darray>
 struct constrained_step {
 
     /// Register a new @param step_size constraint
-    template <
-        step::constraint type,
-        std::enable_if_t<not(type == step::constraint::e_all), bool> = true>
+    template <step::constraint type,
+              std::enable_if_t<type != step::constraint::e_all, bool> = true>
     DETRAY_HOST_DEVICE void set(const scalar step_size) {
         _constraints[type] = std::min(_constraints[type], std::abs(step_size));
     }

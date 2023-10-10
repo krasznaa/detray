@@ -120,7 +120,7 @@ inline void from_json(const nlohmann::ordered_json& j,
 template <typename content_t>
 inline void to_json(nlohmann::ordered_json& j,
                     const detector_grids_payload<content_t>& d) {
-    if (not d.grids.empty()) {
+    if (!d.grids.empty()) {
         nlohmann::ordered_json jgrids;
         for (const auto& gr : d.grids) {
             jgrids.push_back(gr);

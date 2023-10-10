@@ -90,8 +90,8 @@ class single3D {
     DETRAY_HOST_DEVICE inline bool check_boundaries(
         const bounds_t<scalar_t, kDIM> &bounds, const point_t &loc_p,
         const scalar_t tol = std::numeric_limits<scalar_t>::epsilon()) const {
-        return (bounds[e_lower] - tol <= loc_p[kCheckIndex] and
-                loc_p[kCheckIndex] <= bounds[e_upper] + tol);
+        return (((bounds[e_lower] - tol) <= loc_p[kCheckIndex]) &&
+                (loc_p[kCheckIndex] <= (bounds[e_upper] + tol)));
     }
 
     /// @brief Lower and upper point for minimal axis aligned bounding box.

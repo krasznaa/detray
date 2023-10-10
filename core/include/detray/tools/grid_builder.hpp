@@ -119,8 +119,8 @@ class grid_builder final : public volume_decorator<detector_t> {
                 if (itr->volume() != vol_idx) {
                     continue;
                 }
-                if (itr->is_sensitive() or
-                    (m_add_passives and itr->is_passive())) {
+                if (itr->is_sensitive() ||
+                    (m_add_passives && itr->is_passive())) {
                     surfaces.push_back(*itr);
                     bf_search.erase(itr);
                 } else {
@@ -143,8 +143,8 @@ class grid_builder final : public volume_decorator<detector_t> {
                     ++itr;
                     continue;
                 }
-                if (itr->is_sensitive() or
-                    (m_add_passives and itr->is_passive())) {
+                if (itr->is_sensitive() ||
+                    (m_add_passives && itr->is_passive())) {
                     const auto vol = det.volume_by_index(itr->volume());
                     // The current volume is already built, so the surface
                     // interface is safe to use

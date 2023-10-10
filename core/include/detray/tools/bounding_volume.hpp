@@ -242,10 +242,10 @@ class axis_aligned_bounding_volume {
             (m_mask[cuboid3D<>::e_max_z] - m_mask[cuboid3D<>::e_min_z])};
 
         // Cannot handle 'inf' propagation through the calculation for now
-        if (std::isinf(scalor_x) or std::isinf(scalor_y) or
+        if (std::isinf(scalor_x) || std::isinf(scalor_y) ||
             std::isinf(scalor_z)) {
             // If the box was infinite to begin with, it stays that way
-            assert(std::isinf(scalor_x) and std::isinf(scalor_y) and
+            assert(std::isinf(scalor_x) && std::isinf(scalor_y) &&
                    std::isinf(scalor_z));
 
             return *this;

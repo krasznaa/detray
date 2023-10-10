@@ -76,7 +76,7 @@ class surface {
     /// @param rhs is the right hand side to be compared to
     DETRAY_HOST_DEVICE
     constexpr auto operator==(const surface &rhs) const -> bool {
-        return (&m_detector == &(rhs.m_detector) and m_desc == rhs.m_desc);
+        return ((&m_detector == &(rhs.m_detector)) && (m_desc == rhs.m_desc));
     }
 
     /// @returns the surface barcode
@@ -142,7 +142,7 @@ class surface {
     /// @returns the surface normal in global coordinates at a given bound/local
     /// position @param p
     template <typename point_t = point2,
-              std::enable_if_t<std::is_same_v<point_t, point3> or
+              std::enable_if_t<std::is_same_v<point_t, point3> ||
                                    std::is_same_v<point_t, point2>,
                                bool> = true>
     DETRAY_HOST_DEVICE constexpr auto normal(const context &ctx,
@@ -154,7 +154,7 @@ class surface {
     /// @returns the cosine of the incidence angle given a local/bound position
     /// @param p and a global direction @param dir
     template <typename point_t = point2,
-              std::enable_if_t<std::is_same_v<point_t, point3> or
+              std::enable_if_t<std::is_same_v<point_t, point3> ||
                                    std::is_same_v<point_t, point2>,
                                bool> = true>
     DETRAY_HOST_DEVICE constexpr auto cos_angle(const context &ctx,
@@ -185,7 +185,7 @@ class surface {
     /// @returns the global position to the given local/bound position @param p
     /// for a given geometry context @param ctx
     template <typename point_t,
-              std::enable_if_t<std::is_same_v<point_t, point3> or
+              std::enable_if_t<std::is_same_v<point_t, point3> ||
                                    std::is_same_v<point_t, point2>,
                                bool> = true>
     DETRAY_HOST_DEVICE constexpr point3 local_to_global(
@@ -324,7 +324,7 @@ class surface {
             return false;
         }
         // Only check, if there is material in the detector
-        if (not m_detector.material_store().all_empty()) {
+        if (!m_detector.material_store().all_empty()) {
             if (is_invalid_value(m_desc.material())) {
                 os << "ERROR: Surface does not have valid material:\n"
                    << *this << std::endl;
@@ -332,7 +332,7 @@ class surface {
             }
         }
         // Check the mask boundaries
-        if (not visit_mask<typename kernels::mask_self_check>(os)) {
+        if (!visit_mask<typename kernels::mask_self_check>(os)) {
             os << "\nSurface: " << *this << std::endl;
             return false;
         }

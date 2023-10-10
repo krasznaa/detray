@@ -123,7 +123,7 @@ inline void check_empty(const detector_t &det) {
     auto find_volumes =
         [](const typename detector_t::volume_finder &vf) -> bool {
         for (const auto &v : vf.all()) {
-            if (not is_invalid_value(v)) {
+            if (!is_invalid_value(v)) {
                 return true;
             }
         }
@@ -143,7 +143,7 @@ inline void check_empty(const detector_t &det) {
     if (det.mask_store().all_empty()) {
         throw std::runtime_error("ERROR: No masks in detector");
     }
-    if (not find_portals()) {
+    if (!find_portals()) {
         throw std::runtime_error("ERROR: No portals in detector");
     }
 
@@ -170,7 +170,7 @@ inline void check_empty(const detector_t &det) {
         std::make_index_sequence<detector_t::sf_finders::n_types>{});
 
     // Check volume search data structure
-    if (not find_volumes(det.volume_search_grid())) {
+    if (!find_volumes(det.volume_search_grid())) {
         std::cout << "WARNING: No entries in volume finder" << std::endl;
     }
 }
@@ -187,7 +187,7 @@ inline bool check_consistency(const detector_t &det) {
         const auto vol = detector_volume{det, vol_desc};
 
         // Check that nothing is obviously broken
-        if (not vol.self_check(err_stream)) {
+        if (!vol.self_check(err_stream)) {
             throw std::invalid_argument(err_stream.str());
         }
 
@@ -208,7 +208,7 @@ inline bool check_consistency(const detector_t &det) {
         const auto sf = surface{det, sf_desc};
 
         // Check that nothing is obviously broken
-        if (not sf.self_check(err_stream)) {
+        if (!sf.self_check(err_stream)) {
             err_stream << "\nat surface no. " << std::to_string(idx);
             throw std::invalid_argument(err_stream.str());
         }
@@ -229,7 +229,7 @@ inline bool check_consistency(const detector_t &det) {
         vol.template visit_surfaces<detail::surface_checker>(
             sf_desc, is_registered, det);
 
-        if (not is_registered) {
+        if (!is_registered) {
             err_stream << "ERROR: Found surface that is not part of its "
                        << "volume's navigation acceleration data structures:\n"
                        << "Surface: " << sf;

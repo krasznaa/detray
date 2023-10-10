@@ -105,8 +105,8 @@ class cylinder2D {
                 return false;
             }
         }
-        return (bounds[e_n_half_z] - tol <= loc_p[1] and
-                loc_p[1] <= bounds[e_p_half_z] + tol);
+        return (((bounds[e_n_half_z] - tol) <= loc_p[1]) &&
+                (loc_p[1] <= (bounds[e_p_half_z] + tol)));
     }
 
     /// @brief Lower and upper point for minimal axis aligned bounding box.
@@ -150,8 +150,8 @@ class cylinder2D {
                << std::endl;
             return false;
         }
-        if (bounds[e_n_half_z] >= bounds[e_p_half_z] or
-            std::abs(bounds[e_n_half_z] - bounds[e_p_half_z]) < tol) {
+        if ((bounds[e_n_half_z] >= bounds[e_p_half_z]) ||
+            (std::abs(bounds[e_n_half_z] - bounds[e_p_half_z]) < tol)) {
             os << "ERROR: Neg. half length must be smaller than pos. half "
                   "length.";
             return false;

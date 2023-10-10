@@ -132,7 +132,7 @@ struct parameter_transporter : actor {
         const auto& navigation = propagation._navigation;
 
         // Do covariance transport when the track is on surface
-        if (not navigation.is_on_module()) {
+        if (!navigation.is_on_module()) {
             return;
         }
 

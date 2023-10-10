@@ -81,7 +81,7 @@ struct pointwise_material_interactor : actor {
                  detray::ranges::subrange(material_group, material_range)) {
 
                 // return early in case of vacuum or zero thickness
-                if (not mat) {
+                if (!mat) {
                     continue;
                 }
                 success |= true;

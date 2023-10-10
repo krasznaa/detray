@@ -93,12 +93,12 @@ class cylinder3D {
     DETRAY_HOST_DEVICE inline bool check_boundaries(
         const bounds_t<scalar_t, kDIM> &bounds, const point_t &loc_p,
         const scalar_t tol = std::numeric_limits<scalar_t>::epsilon()) const {
-        return (bounds[e_min_r] - tol <= loc_p[0] and
-                bounds[e_min_phi] - tol <= loc_p[1] and
-                bounds[e_min_z] - tol <= loc_p[2] and
-                loc_p[0] <= bounds[e_max_r] + tol and
-                loc_p[1] <= bounds[e_max_phi] + tol and
-                loc_p[2] <= bounds[e_max_z] + tol);
+        return (((bounds[e_min_r] - tol) <= loc_p[0]) &&
+                ((bounds[e_min_phi] - tol) <= loc_p[1]) &&
+                ((bounds[e_min_z] - tol) <= loc_p[2]) &&
+                (loc_p[0] <= (bounds[e_max_r] + tol)) &&
+                (loc_p[1] <= (bounds[e_max_phi] + tol)) &&
+                (loc_p[2] <= (bounds[e_max_z] + tol)));
     }
 
     /// @brief Lower and upper point for minimal axis aligned bounding box.
@@ -143,13 +143,13 @@ class cylinder3D {
                << std::endl;
             return false;
         }
-        if (bounds[e_min_r] >= bounds[e_max_r] or
-            std::abs(bounds[e_min_r] - bounds[e_max_r]) < tol) {
+        if ((bounds[e_min_r] >= bounds[e_max_r]) ||
+            (std::abs(bounds[e_min_r] - bounds[e_max_r]) < tol)) {
             os << "ERROR: Min Radius must be smaller than max Radius.";
             return false;
         }
-        if (bounds[e_min_z] >= bounds[e_max_z] or
-            std::abs(bounds[e_min_z] - bounds[e_max_z]) < tol) {
+        if ((bounds[e_min_z] >= bounds[e_max_z]) ||
+            (std::abs(bounds[e_min_z] - bounds[e_max_z]) < tol)) {
             os << "ERROR: Min z must be smaller than max z.";
             return false;
         }

@@ -93,9 +93,9 @@ class surface_descriptor {
     /// @param rhs is the right hand side to be compared to
     DETRAY_HOST_DEVICE
     constexpr auto operator==(const surface_descriptor &rhs) const -> bool {
-        return (_mask == rhs._mask and _material == rhs._material and
-                _trf == rhs._trf and _src == rhs._src and
-                m_barcode == rhs.m_barcode);
+        return ((_mask == rhs._mask) && (_material == rhs._material) &&
+                (_trf == rhs._trf) && (_src == rhs._src) &&
+                (m_barcode == rhs.m_barcode));
     }
 
     /// Sets a new surface barcode

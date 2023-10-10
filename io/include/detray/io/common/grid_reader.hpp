@@ -202,8 +202,8 @@ class grid_reader : public reader_interface<detector_t> {
     /// @param grid_data grid IO payload (read from file)
     /// @param det_builder gather the grid data and build the final volume
     template <typename bounds_ts, typename binning_ts,
-              std::enable_if_t<types::size<bounds_ts> == Dim and
-                                   types::size<binning_ts> == Dim,
+              std::enable_if_t<(types::size<bounds_ts> == Dim) &&
+                                   (types::size<binning_ts> == Dim),
                                bool> = true>
     static void deserialize(
         const grid_payload<content_t> &grid_data,
@@ -277,8 +277,8 @@ class grid_reader : public reader_interface<detector_t> {
     /// @brief End of recursion: build the grid from the @param grid_data
     template <typename local_frame_t, typename... bounds_ts,
               typename... binning_ts,
-              std::enable_if_t<sizeof...(bounds_ts) == Dim and
-                                   sizeof...(binning_ts) == Dim,
+              std::enable_if_t<(sizeof...(bounds_ts) == Dim) &&
+                                   (sizeof...(binning_ts) == Dim),
                                bool> = true>
     static void deserialize(
         const grid_payload<content_t> &grid_data,

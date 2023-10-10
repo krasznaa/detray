@@ -100,7 +100,7 @@ class homogeneous_material_writer : public writer_interface<detector_t> {
             if (mslp.mat_link.type == material_type::slab) {
                 mv_data.mat_slabs.push_back(mslp);
             } else if (mslp.mat_link.type == material_type::rod) {
-                if (not mv_data.mat_rods.has_value()) {
+                if (!mv_data.mat_rods.has_value()) {
                     mv_data.mat_rods.emplace();
                 }
                 mv_data.mat_rods->push_back(mslp);

@@ -46,6 +46,11 @@ list( APPEND detray_core_public_headers "detray/version.hpp" )
 target_include_directories( detray_core INTERFACE
    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}> )
 
+# Make <cmath> provide math constants with MSVC.
+if( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC" )
+   target_compile_definitions( detray_core INTERFACE _USE_MATH_DEFINES )
+endif()
+
 # Set up the libraries that use specific algebra plugins.
 detray_add_library( detray_core_array core_array )
 target_link_libraries( detray_core_array

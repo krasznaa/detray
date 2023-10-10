@@ -1,6 +1,6 @@
 /** Detray library, part of the ACTS project (R&D line)
  *
- * (c) 2022 CERN for the benefit of the ACTS project
+ * (c) 2022-2023 CERN for the benefit of the ACTS project
  *
  * Mozilla Public License Version 2.0
  */
@@ -97,8 +97,8 @@ class type_registry {
     /// @param index argument to be converted to valid id type
     ///
     /// @return the matching ID type.
-    template <std::size_t ref_idx = 0>
-    DETRAY_HOST_DEVICE static constexpr std::size_t to_index(const ID id) {
+    template <dindex ref_idx = 0>
+    DETRAY_HOST_DEVICE static constexpr dindex to_index(const ID id) {
         if (to_id(ref_idx) == id) {
             // Produce a more helpful error than the usual tuple index error
             static_assert(
@@ -138,8 +138,8 @@ class type_registry {
     template <typename object_t, typename first_t = empty_type,
               typename... remaining_types>
     DETRAY_HOST_DEVICE static constexpr ID unroll_ids() {
-        if constexpr (not std::is_same_v<first_t, empty_type> and
-                      not std::is_same_v<object_t, first_t>) {
+        if constexpr ((!std::is_same_v<first_t, empty_type>)&&(
+                          !std::is_same_v<object_t, first_t>)) {
             return unroll_ids<object_t, remaining_types...>();
         }
         if constexpr (std::is_same_v<object_t, first_t>) {

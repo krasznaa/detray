@@ -135,7 +135,7 @@ struct interaction {
         const scalar_type q2OverBeta2{rq.m_q2OverBeta2};
 
         // if electron or positron
-        if ((pdg == pdg_particle::eElectron) or
+        if ((pdg == pdg_particle::eElectron) ||
             (pdg == pdg_particle::ePositron)) {
             //@todo (Beomki): Not sure if we need this function. At least we
             // need to find the reference for this equation

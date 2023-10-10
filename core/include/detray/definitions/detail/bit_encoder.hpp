@@ -64,7 +64,16 @@ class bit_encoder {
     /// @note undefined behaviour for mask == 0 which we should not have.
     DETRAY_HOST_DEVICE
     static constexpr int extract_shift(value_t mask) noexcept {
+#if (defined(__GNUC__) || defined(__clang__))
         return __builtin_ctzll(mask);
+#else
+        int n = 0;
+        if (mask != 0) {
+            for (; (mask & 0x1) == 0; ++n, mask >>= 1)
+                ;
+        }
+        return n;
+#endif
     }
 };
 

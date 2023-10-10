@@ -67,7 +67,7 @@ struct object_tracer {
     auto operator()(state_type &state, const char * /*message*/) {
 
         // Record the candidate of an encountered object
-        if ((is_status(state.status(), navigation_status) or ...)) {
+        if ((is_status(state.status(), navigation_status) || ...)) {
             object_trace.push_back(std::move(*(state.current())));
         }
     }
@@ -115,7 +115,7 @@ struct print_inspector {
             debug_stream << ", glob: [r:" << getter::perp(pos)
                          << ", z:" << pos[2] << "]" << std::endl;
         }
-        if (not state.candidates().empty()) {
+        if (!state.candidates().empty()) {
             debug_stream << "=> next: ";
             if (state.is_exhausted()) {
                 debug_stream << "exhausted" << std::endl;
@@ -148,7 +148,7 @@ struct print_inspector {
         };
 
         debug_stream << "current object\t\t\t";
-        if (state.is_on_portal() or state.is_on_module() or
+        if (state.is_on_portal() || state.is_on_module() ||
             state.status() == status::e_on_target) {
             debug_stream << state.barcode() << std::endl;
         } else {
@@ -232,8 +232,8 @@ struct print_inspector : actor {
         }
 
         printer.stream << "surface: " << std::setw(14);
-        if (navigation.is_on_portal() or navigation.is_on_module() or
-            navigation.status() == navigation::status::e_on_target) {
+        if (navigation.is_on_portal() || navigation.is_on_module() ||
+            (navigation.status() == navigation::status::e_on_target)) {
             printer.stream << navigation.barcode();
         } else {
             printer.stream << "undefined";

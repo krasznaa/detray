@@ -1,6 +1,6 @@
 /** Detray library, part of the ACTS project (R&D line)
  *
- * (c) 2022 CERN for the benefit of the ACTS project
+ * (c) 2022-2023 CERN for the benefit of the ACTS project
  *
  * Mozilla Public License Version 2.0
  */
@@ -201,7 +201,7 @@ struct circular {
     DETRAY_HOST_DEVICE
     auto constexpr map(const int ibin, const std::size_t nbins) const noexcept
         -> dindex {
-        if (ibin >= 0 and ibin < static_cast<int>(nbins)) {
+        if ((ibin >= 0) && (ibin < static_cast<int>(nbins))) {
             return static_cast<dindex>(ibin);
         } else {
             return static_cast<dindex>(wrap(ibin, nbins));

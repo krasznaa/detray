@@ -107,8 +107,8 @@ class cuboid_portal_generator final
         std::size_t n_surfaces{surfaces.size()};
         assert(n_surfaces != 0u);
         // Make sure data is consistent
-        assert(n_surfaces == transforms.size() and
-               n_surfaces == masks.total_size());
+        assert((n_surfaces == transforms.size()) &&
+               (n_surfaces == masks.total_size()));
 
         // The surfaces container is prefilled with other surfaces
         dindex surfaces_offset = static_cast<dindex>(n_surfaces);

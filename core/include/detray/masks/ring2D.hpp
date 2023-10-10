@@ -92,8 +92,8 @@ class ring2D {
         const bounds_t<scalar_t, kDIM> &bounds, const point_t &loc_p,
         const scalar_t tol = std::numeric_limits<scalar_t>::epsilon()) const {
 
-        return (loc_p[0] + tol >= bounds[e_inner_r] and
-                loc_p[0] <= bounds[e_outer_r] + tol);
+        return (((loc_p[0] + tol) >= bounds[e_inner_r]) &&
+                (loc_p[0] <= (bounds[e_outer_r] + tol)));
     }
 
     /// @brief Lower and upper point for minimal axis aligned bounding box.
@@ -131,13 +131,13 @@ class ring2D {
 
         constexpr auto tol{10.f * std::numeric_limits<scalar_t>::epsilon()};
 
-        if (std::signbit(bounds[e_inner_r]) or bounds[e_outer_r] < tol) {
+        if (std::signbit(bounds[e_inner_r]) || (bounds[e_outer_r] < tol)) {
             os << "ERROR: Radius must be in the range [0, numeric_max)"
                << std::endl;
             return false;
         }
-        if (bounds[e_inner_r] >= bounds[e_outer_r] or
-            std::abs(bounds[e_inner_r] - bounds[e_outer_r]) < tol) {
+        if ((bounds[e_inner_r] >= bounds[e_outer_r]) ||
+            (std::abs(bounds[e_inner_r] - bounds[e_outer_r]) < tol)) {
             os << "ERROR: Inner radius must be smaller outer radius.";
             return false;
         }

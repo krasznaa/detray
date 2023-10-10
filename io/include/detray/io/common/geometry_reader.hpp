@@ -197,7 +197,7 @@ class geometry_reader : public reader_interface<detector_t> {
             [[maybe_unused]] constexpr auto mask_id{mask_info_t::value};
 
             // Test wether this shape exists in detector
-            if constexpr (not std::is_same_v<shape_t, void>) {
+            if constexpr (!std::is_same_v<shape_t, void>) {
                 // Get the correct factory for the type of surface
                 switch (sf_type) {
                     case surface_id::e_portal:

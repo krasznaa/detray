@@ -257,7 +257,7 @@ class navigator {
         /// (cannot be used when not on surface) - const
         DETRAY_HOST_DEVICE
         inline auto get_surface() const {
-            assert(is_on_module() or is_on_portal());
+            assert(is_on_module() || is_on_portal());
             return surface<detector_type>{*m_detector, barcode()};
         }
 
@@ -354,7 +354,8 @@ class navigator {
         DETRAY_HOST_DEVICE
         inline auto is_complete() const -> bool {
             // Normal exit for this navigation?
-            return m_status == navigation::status::e_on_target and !m_heartbeat;
+            return ((m_status == navigation::status::e_on_target) &&
+                    (!m_heartbeat));
         }
 
         /// Navigation state that cannot be recovered from. Leave the other
@@ -391,7 +392,7 @@ class navigator {
         DETRAY_HOST_DEVICE inline auto is_on_object(
             const intersection_type &candidate, const track_t &track) const
             -> bool {
-            if ((candidate.path < m_on_object_tolerance) and
+            if ((candidate.path < m_on_object_tolerance) &&
                 (candidate.path > track.overstep_tolerance())) {
                 return true;
             }
@@ -405,9 +406,10 @@ class navigator {
         template <typename track_t>
         DETRAY_HOST_DEVICE inline auto is_reachable(
             const intersection_type &candidate, track_t &track) const -> bool {
-            return candidate.status == intersection::status::e_inside and
-                   candidate.path < std::numeric_limits<scalar_type>::max() and
-                   candidate.path >= track.overstep_tolerance();
+            return (
+                (candidate.status == intersection::status::e_inside) &&
+                (candidate.path < std::numeric_limits<scalar_type>::max()) &&
+                (candidate.path >= track.overstep_tolerance()));
         }
 
         /// @returns next object that we want to reach (current target)
@@ -443,8 +445,8 @@ class navigator {
         /// Call the navigation inspector
         DETRAY_HOST_DEVICE
         inline void run_inspector([[maybe_unused]] const char *message) {
-            if constexpr (not std::is_same_v<inspector_t,
-                                             navigation::void_inspector>) {
+            if constexpr (!std::is_same_v<inspector_t,
+                                          navigation::void_inspector>) {
                 m_inspector(*this, message);
             }
         }
@@ -579,7 +581,7 @@ class navigator {
         navigation.m_heartbeat &= init(propagation);
 
         // Sanity check: Should never be the case after complete update call
-        if (navigation.trust_level() != navigation::trust_level::e_full or
+        if ((navigation.trust_level() != navigation::trust_level::e_full) ||
             navigation.is_exhausted()) {
             navigation.abort();
         }
@@ -610,12 +612,12 @@ class navigator {
 
         // Update only the current candidate and the corresponding next target
         // - do this only when the navigation state is still coherent
-        if (navigation.trust_level() == navigation::trust_level::e_high or
+        if ((navigation.trust_level() == navigation::trust_level::e_high) ||
             navigation.n_candidates() == 1) {
 
             // Update next candidate: If not reachable, 'high trust' is broken
-            if (not update_candidate(*navigation.next(), track, det,
-                                     propagation.mask_tolerance())) {
+            if (!update_candidate(*navigation.next(), track, det,
+                                  propagation.mask_tolerance())) {
                 navigation.m_status = navigation::status::e_unknown;
                 navigation.set_no_trust();
                 return;
@@ -628,7 +630,7 @@ class navigator {
 
             // The work is done if: the track has not reached a surface yet or
             // trust is gone (portal was reached or the cache is broken).
-            if (navigation.status() == navigation::status::e_towards_object or
+            if ((navigation.status() == navigation::status::e_towards_object) ||
                 navigation.trust_level() ==
                     navigation::trust_level::e_no_trust) {
                 return;
@@ -653,8 +655,8 @@ class navigator {
 
             for (auto &candidate : navigation) {
                 // Disregard this candidate if it is not reachable
-                if (not update_candidate(candidate, track, det,
-                                         propagation.mask_tolerance())) {
+                if (!update_candidate(candidate, track, det,
+                                      propagation.mask_tolerance())) {
                     // Forcefully set dist to numeric max for sorting
                     candidate.path = std::numeric_limits<scalar_type>::max();
                 }

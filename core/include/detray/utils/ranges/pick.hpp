@@ -64,14 +64,14 @@ class pick_view : public detray::ranges::view_interface<
         /// @returns true if we reach end of sequence
         DETRAY_HOST_DEVICE
         constexpr auto operator==(const iterator &rhs) const -> bool {
-            return (m_seq_iter == rhs.m_seq_iter) and
+            return (m_seq_iter == rhs.m_seq_iter) &&
                    (m_range_iter == rhs.m_range_iter);
         }
 
         /// Determine whether we reach end of range - const
         DETRAY_HOST_DEVICE constexpr auto operator!=(const iterator &rhs) const
             -> bool {
-            return (m_seq_iter != rhs.m_seq_iter) or
+            return (m_seq_iter != rhs.m_seq_iter) ||
                    (m_range_iter != rhs.m_range_iter);
         }
 

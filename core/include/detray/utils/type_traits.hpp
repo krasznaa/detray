@@ -1,6 +1,6 @@
 /** Detray library, part of the ACTS project (R&D line)
  *
- * (c) 2022 CERN for the benefit of the ACTS project
+ * (c) 2022-2023 CERN for the benefit of the ACTS project
  *
  * Mozilla Public License Version 2.0
  */
@@ -52,8 +52,7 @@ template <typename container_t>
 struct get_value_type<
     container_t,
     std::enable_if_t<
-        not std::is_same_v<typename remove_cvref_t<container_t>::value_type,
-                           void>,
+        !std::is_same_v<typename remove_cvref_t<container_t>::value_type, void>,
         void>> {
     using type = typename remove_cvref_t<container_t>::value_type;
 };
@@ -71,14 +70,16 @@ struct is_interval : public std::false_type {};
 template <typename TYPE>
 struct is_interval<
     TYPE,
-    std::enable_if_t<not std::is_arithmetic_v<std::remove_reference_t<TYPE>> and
-                         std::is_arithmetic_v<std::remove_reference_t<decltype(
-                             detray::detail::get<0>(std::declval<TYPE>()))>>,
-                     void>,
-    std::enable_if_t<not std::is_arithmetic_v<std::remove_reference_t<TYPE>> and
-                         std::is_arithmetic_v<std::remove_reference_t<decltype(
-                             detray::detail::get<1>(std::declval<TYPE>()))>>,
-                     void>> : public std::true_type {};
+    std::enable_if_t<
+        (!std::is_arithmetic_v<std::remove_reference_t<TYPE>>)&&std::
+            is_arithmetic_v<std::remove_reference_t<decltype(
+                detray::detail::get<0>(std::declval<TYPE>()))>>,
+        void>,
+    std::enable_if_t<
+        (!std::is_arithmetic_v<std::remove_reference_t<TYPE>>)&&std::
+            is_arithmetic_v<std::remove_reference_t<decltype(
+                detray::detail::get<1>(std::declval<TYPE>()))>>,
+        void>> : public std::true_type {};
 
 template <typename TYPE>
 inline constexpr bool is_interval_v = is_interval<TYPE>::value;
@@ -114,7 +115,7 @@ struct get_type_pos {
     /// @note Returns the position of the type counted from the back!
     template <typename first_t, typename... remaining_types>
     DETRAY_HOST_DEVICE static inline constexpr std::size_t type_pos_back() {
-        if constexpr (not std::is_same_v<T, first_t>) {
+        if constexpr (!std::is_same_v<T, first_t>) {
             return type_pos_back<remaining_types...>();
         }
         if constexpr (std::is_same_v<T, first_t>) {

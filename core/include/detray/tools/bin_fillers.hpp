@@ -69,7 +69,7 @@ struct fill_by_pos {
         // Fill the volumes surfaces into the grid
         for (const auto [idx, sf] : detray::views::enumerate(surfaces)) {
             // no portals in grids allowed
-            if (not sf.is_sensitive() or sf.volume() != vol.index()) {
+            if ((!sf.is_sensitive()) || (sf.volume() != vol.index())) {
                 continue;
             }
 

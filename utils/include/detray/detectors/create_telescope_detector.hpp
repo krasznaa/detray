@@ -45,7 +45,8 @@ struct tel_det_config {
     /// Construct from mask parameters (except volume link, which is not needed)
     template <
         typename... Args,
-        std::enable_if_t<(std::is_same_v<Args, scalar> || ...), bool> = true>
+        std::enable_if_t<std::disjunction_v<std::is_same<Args, scalar>...>,
+                         bool> = true>
     tel_det_config(Args &&... args) : m_mask(0u, std::forward<Args>(args)...) {}
 
     /// Mask of the test surfaces

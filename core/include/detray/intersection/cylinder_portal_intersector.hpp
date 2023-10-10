@@ -70,7 +70,7 @@ struct cylinder_portal_intersector
         const auto qe = this->solve_intersection(ray, mask, trf);
 
         // Find the closest valid intersection
-        if (qe.solutions() > 0 and qe.larger() > ray.overstep_tolerance()) {
+        if ((qe.solutions() > 0) && (qe.larger() > ray.overstep_tolerance())) {
             // Only the closest intersection that is outside the overstepping
             // tolerance is needed
             const scalar_type t{(qe.smaller() > ray.overstep_tolerance())

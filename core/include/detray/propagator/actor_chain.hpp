@@ -1,6 +1,6 @@
 /** Detray library, part of the ACTS project (R&D line)
  *
- * (c) 2022 CERN for the benefit of the ACTS project
+ * (c) 2022-2023 CERN for the benefit of the ACTS project
  *
  * Mozilla Public License Version 2.0
  */
@@ -57,7 +57,7 @@ class actor_chain {
     DETRAY_HOST_DEVICE inline void run(const actor_t &actr,
                                        actor_states_t &states,
                                        propagator_state_t &p_state) const {
-        if constexpr (not typename actor_t::is_comp_actor()) {
+        if constexpr (!typename actor_t::is_comp_actor()) {
             actr(detail::get<typename actor_t::state &>(states), p_state);
         } else {
             actr(states, p_state);
