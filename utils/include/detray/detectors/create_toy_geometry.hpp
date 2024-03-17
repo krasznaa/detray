@@ -34,8 +34,6 @@
 
 namespace detray {
 
-namespace {
-
 /// Configure the toy detector
 struct toy_det_config {
     /// No. of barrel layers the detector should be built with
@@ -130,18 +128,19 @@ template <typename context_t, typename volume_type,
           typename surface_container_t, typename mask_container_t,
           typename material_container_t, typename transform_container_t,
           typename config_t>
-inline void create_barrel_modules(context_t &ctx, volume_type &vol,
-                                  surface_container_t &surfaces,
-                                  mask_container_t &masks,
-                                  material_container_t &materials,
-                                  transform_container_t &transforms,
-                                  config_t cfg) {
+void create_barrel_modules(context_t &ctx, volume_type &vol,
+                           surface_container_t &surfaces,
+                           mask_container_t &masks,
+                           material_container_t &materials,
+                           transform_container_t &transforms, config_t cfg) {
+
     using surface_type = typename surface_container_t::value_type;
     using nav_link_t = typename surface_type::navigation_link;
     using mask_id = typename surface_type::mask_id;
     using mask_link_type = typename surface_type::mask_link;
     using material_id = typename surface_type::material_id;
     using material_link_type = typename surface_type::material_link;
+    using scalar_type = typename transform_container_t::value_type::scalar_type;
 
     constexpr auto rectangle_id = mask_id::e_rectangle2;
     constexpr auto slab_id = material_id::e_slab;
@@ -160,25 +159,26 @@ inline void create_barrel_modules(context_t &ctx, volume_type &vol,
     m_centers.reserve(n_phi_bins * n_z_bins);
 
     // prep work
-    scalar phi_step{2.f * constant<scalar>::pi /
-                    static_cast<scalar>(n_phi_bins)};
-    scalar min_phi{-constant<scalar>::pi + 0.5f * phi_step};
+    scalar_type phi_step{2.f * constant<scalar_type>::pi /
+                         static_cast<scalar_type>(n_phi_bins)};
+    scalar_type min_phi{-constant<scalar_type>::pi + 0.5f * phi_step};
 
-    scalar z_start{-0.5f * static_cast<scalar>(n_z_bins - 1u) *
-                   (2.f * cfg.m_half_y - cfg.m_long_overlap)};
-    scalar z_step{(math::abs(z_start) - z_start) /
-                  static_cast<scalar>(n_z_bins - 1)};
+    scalar_type z_start{-0.5f * static_cast<scalar_type>(n_z_bins - 1u) *
+                        (2.f * cfg.m_half_y - cfg.m_long_overlap)};
+    scalar_type z_step{(math::abs(z_start) - z_start) /
+                       static_cast<scalar_type>(n_z_bins - 1)};
 
     // loop over the z bins
     for (unsigned int z_bin = 0u; z_bin < n_z_bins; ++z_bin) {
         // prepare z and r
-        scalar m_z{z_start + static_cast<scalar>(z_bin) * z_step};
-        scalar m_r{(z_bin % 2u) != 0u
-                       ? cfg.layer_r - 0.5f * cfg.m_radial_stagger
-                       : cfg.layer_r + 0.5f * cfg.m_radial_stagger};
+        scalar_type m_z{z_start + static_cast<scalar_type>(z_bin) * z_step};
+        scalar_type m_r{(z_bin % 2u) != 0u
+                            ? cfg.layer_r - 0.5f * cfg.m_radial_stagger
+                            : cfg.layer_r + 0.5f * cfg.m_radial_stagger};
         for (unsigned int phiBin = 0u; phiBin < n_phi_bins; ++phiBin) {
             // calculate the current phi value
-            scalar m_phi{min_phi + static_cast<scalar>(phiBin) * phi_step};
+            scalar_type m_phi{min_phi +
+                              static_cast<scalar_type>(phiBin) * phi_step};
             m_centers.push_back(
                 {m_r * math::cos(m_phi), m_r * math::sin(m_phi), m_z});
         }
@@ -204,7 +204,7 @@ inline void create_barrel_modules(context_t &ctx, volume_type &vol,
 
         // Build the transform
         // The local phi
-        scalar m_phi{algebra::getter::phi(m_center)};
+        scalar_type m_phi{algebra::getter::phi(m_center)};
         // Local z axis is the normal vector
         typename transform_container_t::value_type::vector3 m_local_z{
             math::cos(m_phi + cfg.m_tilt_phi),
@@ -236,10 +236,11 @@ template <
                             typename detector_t::material_container &,
                             typename detector_t::transform_container &>,
         bool> = true>
-inline dindex_range add_cylinder_grid(
-    const typename detector_t::geometry_context &ctx,
-    vecmem::memory_resource &resource, typename detector_t::volume_type &vol,
-    detector_t &det, factory_t &module_factory) {
+dindex_range add_cylinder_grid(const typename detector_t::geometry_context &ctx,
+                               vecmem::memory_resource &resource,
+                               typename detector_t::volume_type &vol,
+                               detector_t &det, factory_t &module_factory) {
+
     // Get relevant ids
     using geo_obj_ids = typename detector_t::geo_obj_ids;
 
@@ -330,10 +331,11 @@ template <
                             typename detector_t::material_container &,
                             typename detector_t::transform_container &>,
         bool> = true>
-inline dindex_range add_disc_grid(
-    const typename detector_t::geometry_context &ctx,
-    vecmem::memory_resource &resource, typename detector_t::volume_type &vol,
-    detector_t &det, factory_t &module_factory) {
+dindex_range add_disc_grid(const typename detector_t::geometry_context &ctx,
+                           vecmem::memory_resource &resource,
+                           typename detector_t::volume_type &vol,
+                           detector_t &det, factory_t &module_factory) {
+
     // Get relevant ids
     using geo_obj_ids = typename detector_t::geo_obj_ids;
 
@@ -406,21 +408,27 @@ inline dindex_range add_disc_grid(
  *
  * @return a vector of the module positions in a ring
  */
-inline auto module_positions_ring(scalar z, scalar radius, scalar phi_stagger,
-                                  scalar phi_sub_stagger,
-                                  unsigned int n_phi_bins) {
+template <typename vector3_t>
+inline std::vector<vector3_t> module_positions_ring(
+    typename vector3_t::value_type z, typename vector3_t::value_type radius,
+    typename vector3_t::value_type phi_stagger,
+    typename vector3_t::value_type phi_sub_stagger, unsigned int n_phi_bins) {
+
+    // Convenience type declaration.
+    using scalar_type = typename vector3_t::value_type;
+
     // create and fill the positions
-    std::vector<__plugin::vector3<scalar>> r_positions;
+    std::vector<vector3_t> r_positions;
     r_positions.reserve(n_phi_bins);
 
     // prep work
-    scalar phi_step{2.f * constant<scalar>::pi /
-                    static_cast<scalar>(n_phi_bins)};
-    scalar min_phi{-constant<scalar>::pi + 0.5f * phi_step};
+    scalar_type phi_step{2.f * constant<scalar_type>::pi /
+                         static_cast<scalar_type>(n_phi_bins)};
+    scalar_type min_phi{-constant<scalar_type>::pi + 0.5f * phi_step};
 
     for (unsigned int iphi = 0u; iphi < n_phi_bins; ++iphi) {
         // if we have a phi sub stagger presents
-        scalar rzs{0.f};
+        scalar_type rzs{0.f};
         // phi stagger affects 0 vs 1, 2 vs 3 ... etc
         // -> only works if it is a %4
         // phi sub stagger affects 2 vs 4, 1 vs 3 etc.
@@ -433,9 +441,10 @@ inline auto module_positions_ring(scalar z, scalar radius, scalar phi_stagger,
             }
         }
         // the module phi
-        scalar phi{min_phi + static_cast<scalar>(iphi) * phi_step};
+        scalar_type phi{min_phi + static_cast<scalar_type>(iphi) * phi_step};
         // main z position depending on phi bin
-        scalar rz{iphi % 2u ? z - 0.5f * phi_stagger : z + 0.5f * phi_stagger};
+        scalar_type rz{iphi % 2u ? z - 0.5f * phi_stagger
+                                 : z + 0.5f * phi_stagger};
         r_positions.push_back(
             {radius * math::cos(phi), radius * math::sin(phi), rz + rzs});
     }
@@ -457,18 +466,19 @@ template <typename context_t, typename volume_type,
           typename surface_container_t, typename mask_container_t,
           typename material_container_t, typename transform_container_t,
           typename config_t>
-inline void create_endcap_modules(context_t &ctx, volume_type &vol,
-                                  surface_container_t &surfaces,
-                                  mask_container_t &masks,
-                                  material_container_t &materials,
-                                  transform_container_t &transforms,
-                                  config_t cfg) {
+void create_endcap_modules(context_t &ctx, volume_type &vol,
+                           surface_container_t &surfaces,
+                           mask_container_t &masks,
+                           material_container_t &materials,
+                           transform_container_t &transforms, config_t cfg) {
+
     using surface_type = typename surface_container_t::value_type;
     using nav_link_t = typename surface_type::navigation_link;
     using mask_id = typename surface_type::mask_id;
     using mask_link_type = typename surface_type::mask_link;
     using material_id = typename surface_type::material_id;
     using material_link_type = typename surface_type::material_link;
+    using scalar_type = typename transform_container_t::value_type::scalar_type;
 
     constexpr auto trapezoid_id = mask_id::e_trapezoid2;
     constexpr auto slab_id = material_id::e_slab;
@@ -477,11 +487,11 @@ inline void create_endcap_modules(context_t &ctx, volume_type &vol,
     auto mask_volume_link{static_cast<nav_link_t>(volume_idx)};
 
     // calculate the radii of the rings
-    std::vector<scalar> radii;
+    std::vector<scalar_type> radii;
     // calculate the radial borders
-    // std::vector<scalar> radial_boarders;
+    // std::vector<scalar_type> radial_boarders;
     // the radial span of the disc
-    scalar delta_r{cfg.outer_r - cfg.inner_r};
+    scalar_type delta_r{cfg.outer_r - cfg.inner_r};
 
     // Only one ring
     if (cfg.disc_binning.size() == 1u) {
@@ -489,17 +499,18 @@ inline void create_endcap_modules(context_t &ctx, volume_type &vol,
         // radial_boarders = {inner_r, outer_r};
     } else {
         // sum up the total length of the modules along r
-        scalar tot_length{0.f};
+        scalar_type tot_length{0.f};
         for (auto &m_hlength : cfg.m_half_y) {
             tot_length += 2.f * m_hlength + 0.5f;
         }
         // now calculate the overlap (equal pay)
-        scalar r_overlap{(tot_length - delta_r) /
-                         static_cast<scalar>(cfg.m_half_y.size() - 1u)};
+        scalar_type r_overlap{
+            (tot_length - delta_r) /
+            static_cast<scalar_type>(cfg.m_half_y.size() - 1u)};
         // and now fill the radii and gaps
-        scalar prev_r{cfg.inner_r};
-        scalar prev_hl{0.f};
-        scalar prev_ol{0.f};
+        scalar_type prev_r{cfg.inner_r};
+        scalar_type prev_hl{0.f};
+        scalar_type prev_ol{0.f};
         // remember the radial boarders
         // radial_boarders.push_back(inner_r);
         for (auto &m_hlength : cfg.m_half_y) {
@@ -518,17 +529,19 @@ inline void create_endcap_modules(context_t &ctx, volume_type &vol,
     for (unsigned int ir = 0u; ir < radii.size(); ++ir) {
         // generate the z value
         // convention inner ring is closer to origin : makes sense
-        scalar rz{radii.size() == 1u
-                      ? cfg.edc_position
-                      : (ir % 2u ? cfg.edc_position + 0.5f * cfg.ring_stagger
-                                 : cfg.edc_position - 0.5f * cfg.ring_stagger)};
+        scalar_type rz{
+            radii.size() == 1u
+                ? cfg.edc_position
+                : (ir % 2u ? cfg.edc_position + 0.5f * cfg.ring_stagger
+                           : cfg.edc_position - 0.5f * cfg.ring_stagger)};
         // fill the ring module positions
-        scalar ps_stagger{
+        scalar_type ps_stagger{
             cfg.m_phi_sub_stagger.size() ? cfg.m_phi_sub_stagger[ir] : 0.f};
 
-        auto r_postitions =
-            module_positions_ring(rz, radii[ir], cfg.m_phi_stagger[ir],
-                                  ps_stagger, cfg.disc_binning[ir]);
+        auto r_postitions = module_positions_ring<
+            typename transform_container_t::value_type::vector3>(
+            rz, radii[ir], cfg.m_phi_stagger[ir], ps_stagger,
+            cfg.disc_binning[ir]);
 
         // Build the geometrical objects
         for (const auto &m_position : r_postitions) {
@@ -552,16 +565,16 @@ inline void create_endcap_modules(context_t &ctx, volume_type &vol,
                                   surface_id::e_sensitive);
 
             // the module transform from the position
-            scalar m_phi{algebra::getter::phi(m_position)};
+            scalar_type m_phi{algebra::getter::phi(m_position)};
             // the center position of the modules
             auto m_center{m_position};
-            m_center[2] *= static_cast<scalar>(cfg.side);
+            m_center[2] *= static_cast<scalar_type>(cfg.side);
             // the rotation matrix of the module
             typename transform_container_t::value_type::vector3 m_local_y{
                 math::cos(m_phi), math::sin(m_phi), 0.f};
             // take different axis to have the same readout direction
             typename transform_container_t::value_type::vector3 m_local_z{
-                0.f, 0.f, static_cast<scalar>(cfg.side)};
+                0.f, 0.f, static_cast<scalar_type>(cfg.side)};
             typename transform_container_t::value_type::vector3 m_local_x =
                 algebra::vector::cross(m_local_y, m_local_z);
 
@@ -583,29 +596,37 @@ inline void create_endcap_modules(context_t &ctx, volume_type &vol,
  * @param brl_half_z half length of the barrel region in z
  */
 template <typename detector_t>
-inline void add_beampipe(
+void add_beampipe(
     const toy_det_config &cfg, detector_t &det,
     vecmem::memory_resource &resource,
     typename detector_t::geometry_context &ctx,
     typename detector_t::name_map &names, const unsigned int n_edc_layers,
     const unsigned int n_brl_layers,
-    const std::vector<std::pair<scalar, scalar>> &edc_lay_sizes,
-    const std::pair<scalar, scalar> &beampipe_vol_size, const scalar beampipe_r,
-    const scalar brl_half_z, const scalar edc_inner_r) {
+    const std::vector<std::pair<typename detector_t::transform3::scalar_type,
+                                typename detector_t::transform3::scalar_type>>
+        &edc_lay_sizes,
+    const std::pair<typename detector_t::transform3::scalar_type,
+                    typename detector_t::transform3::scalar_type>
+        &beampipe_vol_size,
+    const typename detector_t::transform3::scalar_type beampipe_r,
+    const typename detector_t::transform3::scalar_type brl_half_z,
+    const typename detector_t::transform3::scalar_type edc_inner_r) {
 
     // Get the object types handled by the volume
     using object_id = typename detector_t::volume_type::object_id;
     using material_id = typename detector_t::materials::id;
     using material_link_t = typename detector_t::surface_type::material_link;
     using nav_link_t = typename detector_t::surface_type::navigation_link;
+    using scalar_type = typename detector_t::transform3::scalar_type;
     constexpr auto leaving_world{detail::invalid_value<nav_link_t>()};
     constexpr auto cyl_id = detector_t::masks::id::e_portal_cylinder2;
 
     const detail::detector_helper<typename detector_t::transform3> det_helper{};
 
-    scalar max_z{n_edc_layers == 0u ? brl_half_z
-                                    : edc_lay_sizes[n_edc_layers - 1u].second};
-    scalar min_z{-max_z};
+    scalar_type max_z{n_edc_layers == 0u
+                          ? brl_half_z
+                          : edc_lay_sizes[n_edc_layers - 1u].second};
+    scalar_type min_z{-max_z};
 
     typename detector_t::surface_container surfaces(&resource);
     typename detector_t::mask_container masks(resource);
@@ -628,7 +649,7 @@ inline void add_beampipe(
     dindex volume_link{beampipe_idx};
 
     // Get vol sizes in z, including for gap volumes
-    std::vector<std::pair<scalar, scalar>> vol_sizes{
+    std::vector<std::pair<scalar_type, scalar_type>> vol_sizes{
         {brl_half_z, edc_lay_sizes[0].first}};
     for (unsigned int i = 0u; i < n_edc_layers; ++i) {
         vol_sizes.emplace_back(edc_lay_sizes[i].first, edc_lay_sizes[i].second);
@@ -694,7 +715,7 @@ inline void add_beampipe(
                 min_z, max_z, beampipe_idx);
 
     materials.template emplace_back<material_id::e_slab>(
-        {}, beryllium_tml<scalar>(), 0.8f * unit<scalar>::mm);
+        {}, beryllium_tml<scalar_type>(), 0.8f * unit<scalar_type>::mm);
 
     bp.material() =
         material_link_t{material_id::e_slab,
@@ -733,22 +754,27 @@ inline void add_endcap_barrel_connection(
     typename detector_t::geometry_context &ctx,
     typename detector_t::name_map &names, const int side,
     const unsigned int n_brl_layers, const dindex beampipe_idx,
-    const std::vector<std::pair<scalar, scalar>> &brl_lay_sizes,
-    const scalar edc_inner_r, const scalar edc_outer_r,
-    const scalar gap_lower_z, const scalar gap_upper_z, dindex brl_vol_idx,
-    const dindex edc_vol_idx) {
+    const std::vector<std::pair<typename detector_t::transform3::scalar_type,
+                                typename detector_t::transform3::scalar_type>>
+        &brl_lay_sizes,
+    const typename detector_t::transform3::scalar_type edc_inner_r,
+    const typename detector_t::transform3::scalar_type edc_outer_r,
+    const typename detector_t::transform3::scalar_type gap_lower_z,
+    const typename detector_t::transform3::scalar_type gap_upper_z,
+    dindex brl_vol_idx, const dindex edc_vol_idx) {
 
+    using scalar_type = typename detector_t::transform3::scalar_type;
     using nav_link_t = typename detector_t::surface_type::navigation_link;
     constexpr auto leaving_world{detail::invalid_value<nav_link_t>()};
     constexpr auto cyl_id = detector_t::masks::id::e_portal_cylinder2;
 
     const detail::detector_helper<typename detector_t::transform3> det_helper{};
 
-    const scalar sign{static_cast<scalar>(side)};
-    const scalar min_z{math::min(sign * gap_lower_z, sign * gap_upper_z)};
-    const scalar max_z{math::max(sign * gap_lower_z, sign * gap_upper_z)};
-    const scalar edc_disc_z{side < 0 ? min_z : max_z};
-    const scalar brl_disc_z{side < 0 ? max_z : min_z};
+    const scalar_type sign{static_cast<scalar_type>(side)};
+    const scalar_type min_z{math::min(sign * gap_lower_z, sign * gap_upper_z)};
+    const scalar_type max_z{math::max(sign * gap_lower_z, sign * gap_upper_z)};
+    const scalar_type edc_disc_z{side < 0 ? min_z : max_z};
+    const scalar_type brl_disc_z{side < 0 ? max_z : min_z};
 
     typename detector_t::surface_container surfaces(&resource);
     typename detector_t::mask_container masks(resource);
@@ -791,7 +817,7 @@ inline void add_endcap_barrel_connection(
     det_helper.create_material(cfg, inner_disc, inner_disc_mask, material_coll);
 
     // Get vol sizes in z also for gap volumes
-    std::vector<std::pair<scalar, scalar>> vol_sizes;
+    std::vector<std::pair<scalar_type, scalar_type>> vol_sizes;
     for (unsigned int i = 1u; i <= n_brl_layers; ++i) {
         vol_sizes.emplace_back(brl_lay_sizes[i].first, brl_lay_sizes[i].second);
         if (i < n_brl_layers) {
@@ -836,8 +862,14 @@ inline void add_endcap_detector(
     vecmem::memory_resource &resource,
     typename detector_t::geometry_context &ctx,
     typename detector_t::name_map &names, dindex n_layers, dindex beampipe_idx,
-    const std::vector<std::pair<scalar, scalar>> &lay_sizes,
-    const std::vector<scalar> &lay_positions, config_t factory_cfg) {
+    const std::vector<std::pair<typename detector_t::transform3::scalar_type,
+                                typename detector_t::transform3::scalar_type>>
+        &lay_sizes,
+    const std::vector<typename detector_t::transform3::scalar_type>
+        &lay_positions,
+    config_t factory_cfg) {
+
+    using scalar_type = typename detector_t::transform3::scalar_type;
     using nav_link_t = typename detector_t::surface_type::navigation_link;
     constexpr auto leaving_world{detail::invalid_value<nav_link_t>()};
 
@@ -876,7 +908,7 @@ inline void add_endcap_detector(
     }
 
     // Get vol sizes in z, including gap volumes
-    std::vector<std::pair<scalar, scalar>> vol_sizes{
+    std::vector<std::pair<scalar_type, scalar_type>> vol_sizes{
         {lay_sizes[0].first, lay_sizes[0].second}};
     for (unsigned int i = 1u; i < n_layers; ++i) {
         vol_sizes.emplace_back(lay_sizes[i].first, lay_sizes[i - 1u].second);
@@ -896,7 +928,7 @@ inline void add_endcap_detector(
     for (int i = 0; i < 2 * static_cast<int>(n_layers) - 1; ++i) {
         // Every second layer is a gap volume
         is_gap = !is_gap;
-        const scalar sign{static_cast<scalar>(factory_cfg.side)};
+        const scalar_type sign{static_cast<scalar_type>(factory_cfg.side)};
         if (is_gap) {
             det_helper.create_cyl_volume(
                 cfg, det, resource, ctx, factory_cfg.inner_r,
@@ -948,11 +980,16 @@ inline void add_barrel_detector(
     vecmem::memory_resource &resource,
     typename detector_t::geometry_context &ctx,
     typename detector_t::name_map &names, const unsigned int n_layers,
-    dindex beampipe_idx, const scalar brl_half_z,
-    const std::vector<std::pair<scalar, scalar>> &lay_sizes,
-    const std::vector<scalar> &lay_positions,
+    dindex beampipe_idx,
+    const typename detector_t::transform3::scalar_type brl_half_z,
+    const std::vector<std::pair<typename detector_t::transform3::scalar_type,
+                                typename detector_t::transform3::scalar_type>>
+        &lay_sizes,
+    const std::vector<typename detector_t::transform3::scalar_type>
+        &lay_positions,
     const std::vector<std::pair<int, int>> &m_binning, config_t factory_cfg) {
 
+    using scalar_type = typename detector_t::transform3::scalar_type;
     using nav_link_t = typename detector_t::surface_type::navigation_link;
     constexpr auto leaving_world{detail::invalid_value<nav_link_t>()};
 
@@ -983,7 +1020,7 @@ inline void add_barrel_detector(
         {++prev_vol_idx, leaving_world, first_vol_idx, last_vol_idx});
 
     // Get vol sizes in z, including gap volumes
-    std::vector<std::pair<scalar, scalar>> vol_sizes{
+    std::vector<std::pair<scalar_type, scalar_type>> vol_sizes{
         {lay_sizes[1].first, lay_sizes[1].second}};
     for (unsigned int i = 2u; i < n_layers + 1u; ++i) {
         vol_sizes.emplace_back(lay_sizes[i].first, lay_sizes[i - 1u].second);
@@ -1024,8 +1061,6 @@ inline void add_barrel_detector(
         }
     }
 }
-
-}  // namespace
 
 /// Builds a detray geometry that contains the innermost tml layers. The number
 /// of barrel and endcap layers can be chosen, but all barrel layers should be
