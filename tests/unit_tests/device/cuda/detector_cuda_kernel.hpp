@@ -27,13 +27,12 @@ using surface_t = typename detector_host_t::surface_type;
 using transform3_t = typename detector_host_t::transform3;
 using mask_defs = typename detector_host_t::masks;
 
-constexpr auto rectangle_id = mask_defs::id::e_rectangle2;
-constexpr auto disc_id = mask_defs::id::e_portal_ring2;
-constexpr auto cylinder_id = mask_defs::id::e_portal_cylinder2;
-
-using rectangle_t = typename mask_defs::template get_type<rectangle_id>::type;
-using disc_t = typename mask_defs::template get_type<disc_id>::type;
-using cylinder_t = typename mask_defs::template get_type<cylinder_id>::type;
+using rectangle_t =
+    typename mask_defs::template get_type<mask_defs::id::e_rectangle2>::type;
+using disc_t =
+    typename mask_defs::template get_type<mask_defs::id::e_portal_ring2>::type;
+using cylinder_t = typename mask_defs::template get_type<
+    mask_defs::id::e_portal_cylinder2>::type;
 
 /// declaration of a test function for detector
 void detector_test(typename detector_host_t::view_type det_data,

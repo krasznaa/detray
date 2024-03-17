@@ -25,6 +25,11 @@
 using namespace detray;
 
 TEST(detector_cuda, detector) {
+
+    constexpr auto rectangle_id = mask_defs::id::e_rectangle2;
+    constexpr auto disc_id = mask_defs::id::e_portal_ring2;
+    constexpr auto cylinder_id = mask_defs::id::e_portal_cylinder2;
+
     // memory resource
     vecmem::cuda::managed_memory_resource mng_mr;
 
